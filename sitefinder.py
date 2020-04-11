@@ -84,7 +84,7 @@ class SiteFinder(object):
                 stdout = sys.stdout if self.args.output is None else open(os.path.join(self.args.output,"ligand.fa"), 'w')
                 print(">SEQUENCE;{0}\r".format(self.info.name()), file=stdout)
                 print(self.pose.sequence() + "\r", file=stdout)
-                print(">FRAGMENT;{0}\n".format("PROTEIN" if self.args.getprotein else "LIGAND"), file=stdout)
+                print(">FRAGMENT;{0}\n".format("PROTEIN" if self.args.getprotein else "Fragment"), file=stdout)
                 print(seq, file=stdout)
 
     def extract(self):

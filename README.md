@@ -61,7 +61,7 @@ We knew that RBD (Receptor Binding Domain) of SARS-COV2 is in Chain `B` while AC
 
 #### Ex.
 
-`python sitefinder.py --ligand B --protein A --pdb 6lzg.pdb --output /where/you/want/to/save/yourfile.fa`
+`python sitefinder.py --ligand B --protein A --pdb 6lzg.pdb --output /where/you/want/to/save/`
 
 
 
