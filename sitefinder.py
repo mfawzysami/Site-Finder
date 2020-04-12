@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/home/snouto/protein/venv/rosetta/bin/python
 from __future__ import print_function
 from pyrosetta import *
 import argparse, sys, os
