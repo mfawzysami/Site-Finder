@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 from __future__ import print_function
 from pyrosetta import *
 import argparse, sys, os
@@ -30,9 +30,9 @@ class SiteFinder(object):
         self.p.add_argument("-l", "--ligand", help="The chain identifier of the protein ligand")
         self.p.add_argument("-p", "--protein", help="The chain identifier of the interacting protein")
         self.p.add_argument("-c", "--pdb", help="Protein-Protein(ligand) complex PDB file location")
-        self.p.add_argument("-g", "--getprotein", const=True, nargs="?", default=True,
-                            help="Return The binding fragment from the interacting protein not from the ligand. "
-                                 "Defaults: True, Otherwise, it returns the "
+        self.p.add_argument("-g", "--getligand", const=True, nargs="?", default=False,
+                            help="Return The binding fragment from the ligand not from the interacting protein. "
+                                 "Defaults: False, Otherwise, it returns the "
                                  " fragment from the ligand not from the interacting protein.")
         self.p.add_argument("-d", "--distance", default=5, type=int,
                             help="Inclusive Cutoff distance to use in order to "
@@ -67,8 +67,22 @@ class SiteFinder(object):
                 second_condition = get_bond_length(first.atom(i).xyz(), second.atom(j).xyz()) <= int(self.args.distance)
                 if first_condition and second_condition:
                     result = True
+                    break
 
         return result
+
+    def print_position_file(self):
+        stdout = sys.stdout if self.args.output is None else open(os.path.join(self.args.output, "positions.tsv"), 'w')
+        print("{0}\t{1}\t{2}\t{3}\r".format("res","loci","chain","chain_pos"),file=stdout)
+        for index,item in enumerate(self.fragment):
+            if not isinstance(item,str):
+                loci = self.info.pose2pdb(index+1).strip()
+                chain_loc , chain = loci.split(' ')
+                residue_name = item.annotated_name()[0]
+                print("{0}\t{1}\t{2}\t{3}\r".format(residue_name,index+1,chain,chain_loc),file=stdout)
+
+
+
 
     def print_fragment(self):
         if self.fragment is not None:
@@ -80,12 +94,14 @@ class SiteFinder(object):
                     if isinstance(item, str):
                         seq += item
                     else:
-                        seq += item.annotated_name()
+                        seq += item.annotated_name()[0]
                 stdout = sys.stdout if self.args.output is None else open(os.path.join(self.args.output,"ligand.fa"), 'w')
                 print(">SEQUENCE;{0}\r".format(self.info.name()), file=stdout)
                 print(self.pose.sequence() + "\r", file=stdout)
-                print(">FRAGMENT;{0}\n".format("PROTEIN" if self.args.getprotein else "Fragment"), file=stdout)
+                print(">FRAGMENT;{0}\n".format("PROTEIN" if not self.args.getligand else "Fragment"), file=stdout)
                 print(seq, file=stdout)
+                self.print_position_file()
+                print("Done.",file=sys.stdout)
 
     def extract(self):
         print("Starting Rosetta environment. Please wait....")
@@ -104,13 +120,25 @@ class SiteFinder(object):
             return
         self.info = self.pose.pdb_info()
         print("Building ligand and the interacting protein.")
+        if ',' in str(self.args.ligand):
+            ligand = str(self.args.ligand).split(',')
+        else:
+            ligand = str(self.args.ligand)
+
+        if ',' in str(self.args.protein):
+            protein = str(self.args.protein).split(',')
+        else:
+            protein = str(self.args.protein)
+
         for resId in range(1, self.pose.total_residue() + 1):
             res = self.pose.residue(resId)
             chainid = self.info.chain(resId)
-            if str(chainid) == self.args.ligand:
+            if str(chainid) in ligand:
                 self.ligand.append((resId, res))
-            elif str(chainid) == self.args.protein:
+            elif str(chainid) in protein:
                 self.protein.append((resId, res))
+            else:
+                continue
         print("Building Fragment. Please Wait....")
         self.fragment = ["-" for i in range(self.pose.total_residue())]
         for i in range(0, len(self.protein)):
@@ -118,10 +146,10 @@ class SiteFinder(object):
             for j in range(0, len(self.ligand)):
                 sec_pos, second_residue = self.ligand[j]
                 if self.has_noncovalent_bonding(first_residue, second_residue):
-                    if self.args.getprotein:
-                        self.fragment[fr_pos] = first_residue
+                    if not self.args.getligand:
+                        self.fragment[fr_pos-1] = first_residue
                     else:
-                        self.fragment[sec_pos] = second_residue
+                        self.fragment[sec_pos-1] = second_residue
         self.print_fragment()
 
 
