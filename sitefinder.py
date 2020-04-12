@@ -27,8 +27,8 @@ class SiteFinder(object):
         self.fragment = []
 
     def parse(self):
-        self.p.add_argument("-l", "--ligand", help="The chain identifier of the protein ligand")
-        self.p.add_argument("-p", "--protein", help="The chain identifier of the interacting protein")
+        self.p.add_argument("-l", "--ligand", help="A single chain identifier or comma separated list of identifiers of the protein ligand")
+        self.p.add_argument("-p", "--protein", help="A single chain identifier or comma separated list of identifiers of the interacting protein")
         self.p.add_argument("-c", "--pdb", help="Protein-Protein(ligand) complex PDB file location")
         self.p.add_argument("-g", "--getligand", const=True, nargs="?", default=False,
                             help="Return The binding fragment from the ligand not from the interacting protein. "
