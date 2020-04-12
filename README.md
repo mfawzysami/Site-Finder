@@ -19,6 +19,33 @@ This is the very first step in any protein engineering tasks, is to find the sit
 #### Output
 
 ```text
+usage: sitefinder.py [-h] [-l LIGAND] [-p PROTEIN] [-c PDB] [-g [GETLIGAND]]
+                     [-d DISTANCE] [-o OUTPUT]
+
+Site Finder, It is a tool to extract protein fragment which essentially
+contributes to the binding between two protein complexes
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -l LIGAND, --ligand LIGAND
+                        A single chain identifier or comma separated list of
+                        identifiers of the protein ligand
+  -p PROTEIN, --protein PROTEIN
+                        A single chain identifier or comma separated list of
+                        identifiers of the interacting protein
+  -c PDB, --pdb PDB     Protein-Protein(ligand) complex PDB file location
+  -g [GETLIGAND], --getligand [GETLIGAND]
+                        Return The binding fragment from the ligand not from
+                        the interacting protein. Defaults: False, Otherwise,
+                        it returns the fragment from the ligand not from the
+                        interacting protein.
+  -d DISTANCE, --distance DISTANCE
+                        Inclusive Cutoff distance to use in order to consider
+                        the presence of noncovalent bonding. Defaults: 5
+                        Angstroms
+  -o OUTPUT, --output OUTPUT
+                        Output directory at which to store the FastQ file
+                        containing the protein fragment.
 
 ```
 Let's take an example, `6lzg.pdb` file, this file contains SARS-COV 2 RBD of Spike S protein in complex with ACE2 (Angiotensen converting Enzyme 2).
