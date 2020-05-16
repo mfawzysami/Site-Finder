@@ -1,4 +1,4 @@
-#!/home/snouto/protein/venv/rosetta/bin/python
+#!/usr/bin/env python
 from __future__ import print_function
 from pyrosetta import *
 import argparse, sys, os
@@ -42,7 +42,7 @@ class SiteFinder(object):
         #                     help="Temperature in Celesius to use in order to "
         #                          "calculate the cutoff kinetic energy. "
         #                          "Defaults: 25C room temperature.")
-        self.p.add_argument("-o", "--output", default=None,
+        self.p.add_argument("-o", "--output", default=".",
                             help="Output directory at which to store the FastQ file containing the "
                                  "protein fragment.")
         self.args = self.p.parse_args()
@@ -113,7 +113,8 @@ class SiteFinder(object):
         filename, _ = os.path.splitext(os.path.basename(self.args.pdb))
         cleanATOM(self.args.pdb)
         print("Loading cleaned PDB file. Please wait....")
-        self.pose = pose_from_pdb("{0}.clean.pdb".format(filename))
+        full_file_path = os.path.join(self.args.output,"{0}.clean.pdb".format(filename))
+        self.pose = pose_from_pdb(full_file_path)
         if not isinstance(self.pose, Pose):
             print("PDB file doesn't contain a valid pose object.")
             self.p.print_help()
